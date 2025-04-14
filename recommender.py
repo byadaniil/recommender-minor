@@ -6,111 +6,8 @@ import numpy as np
 
 class SongRecommender:
     def __init__(self):
-        # Initialize with some sample song data
-        self.song_data = pd.DataFrame(
-            [
-                {
-                    "title": "Blinding Lights",
-                    "artist": "The Weeknd",
-                    "genre": "pop",
-                    "tempo": 120,
-                    "danceability": 0.8,
-                    "energy": 0.7,
-                    "mood": "happy",
-                    "acousticness": 0.1,
-                },
-                {
-                    "title": "Save Your Tears",
-                    "artist": "The Weeknd",
-                    "genre": "pop",
-                    "tempo": 118,
-                    "danceability": 0.75,
-                    "energy": 0.65,
-                    "mood": "melancholic",
-                    "acousticness": 0.2,
-                },
-                {
-                    "title": "Levitating",
-                    "artist": "Dua Lipa",
-                    "genre": "pop",
-                    "tempo": 115,
-                    "danceability": 0.85,
-                    "energy": 0.8,
-                    "mood": "happy",
-                    "acousticness": 0.05,
-                },
-                {
-                    "title": "Smooth",
-                    "artist": "Santana",
-                    "genre": "rock",
-                    "tempo": 117,
-                    "danceability": 0.7,
-                    "energy": 0.75,
-                    "mood": "happy",
-                    "acousticness": 0.1,
-                },
-                {
-                    "title": "Bohemian Rhapsody",
-                    "artist": "Queen",
-                    "genre": "rock",
-                    "tempo": 72,
-                    "danceability": 0.4,
-                    "energy": 0.6,
-                    "mood": "dramatic",
-                    "acousticness": 0.4,
-                },
-                {
-                    "title": "Shape of You",
-                    "artist": "Ed Sheeran",
-                    "genre": "pop",
-                    "tempo": 96,
-                    "danceability": 0.8,
-                    "energy": 0.65,
-                    "mood": "romantic",
-                    "acousticness": 0.1,
-                },
-                {
-                    "title": "Uptown Funk",
-                    "artist": "Mark Ronson",
-                    "genre": "funk",
-                    "tempo": 115,
-                    "danceability": 0.9,
-                    "energy": 0.85,
-                    "mood": "happy",
-                    "acousticness": 0.3,
-                },
-                {
-                    "title": "Billie Jean",
-                    "artist": "Michael Jackson",
-                    "genre": "pop",
-                    "tempo": 117,
-                    "danceability": 0.8,
-                    "energy": 0.7,
-                    "mood": "groovy",
-                    "acousticness": 0.2,
-                },
-                {
-                    "title": "Stay",
-                    "artist": "The Kid LAROI",
-                    "genre": "pop",
-                    "tempo": 170,
-                    "danceability": 0.6,
-                    "energy": 0.5,
-                    "mood": "melancholic",
-                    "acousticness": 0.1,
-                },
-                {
-                    "title": "Bad Guy",
-                    "artist": "Billie Eilish",
-                    "genre": "electropop",
-                    "tempo": 135,
-                    "danceability": 0.7,
-                    "energy": 0.5,
-                    "mood": "dark",
-                    "acousticness": 0.2,
-                },
-            ]
-        )
+        # load song data from csv into a dataframe
+        self.song_data = pd.read_csv("data/spotify_cleaned.csv")
 
         # Prepare the data for similarity calculation
         self.prepare_data()
@@ -194,13 +91,28 @@ if __name__ == "__main__":
     print(recommender.song_data[["title", "artist", "genre"]].to_string(index=False))
 
     while True:
-        print("\nEnter song titles you like (comma separated), or 'quit' to exit:")
+
+        # let the user search for a song by title and then confirm selection
+        print("\nEnter a song title to search for:")
         user_input = input().strip()
+        match = recommender.song_data[
+            recommender.song_data["title"].str.contains(user_input, case=False)
+        ]
+        if match.empty:
+            print("No matching song found.")
+            continue
+        print("Matching songs:")
+        print(match[["title", "artist", "genre"]].to_string(index=False))
+        print("\nEnter the index of the song you want to select:")
+        selected_index = int(input().strip())
+        if selected_index < 0 or selected_index >= len(match):
+            print("Invalid index.")
+            continue
+        selected_song = match.iloc[selected_index]
+        input_songs = [selected_song["title"]]
+        print(f"You selected: {selected_song['title']} by {selected_song['artist']}")
+        print("Searching for recommendations...")
 
-        if user_input.lower() == "quit":
-            break
-
-        input_songs = [s.strip() for s in user_input.split(",")]
         recommendations = recommender.recommend(input_songs)
 
         if isinstance(recommendations, str):
