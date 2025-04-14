@@ -25,7 +25,7 @@ class SongRecommender:
         # One-hot encode categorical features
         genres = pd.get_dummies(data["genre"], prefix="genre")
         moods = pd.get_dummies(data["mood"], prefix="mood")
-
+        
         # Scale numerical features
         numerical_features = ["tempo", "danceability", "energy", "acousticness"]
         scaler = MinMaxScaler()
@@ -106,12 +106,6 @@ if __name__ == "__main__":
     recommender = SongRecommender()
 
     print("Welcome to the Song Recommender System!")
-    print("Available songs in database:")
-    print(
-        recommender.song_data[["song_id", "title", "artist", "genre"]].to_string(
-            index=False
-        )
-    )
 
     while True:
         print("\nEnter a song title or artist to search for:")
