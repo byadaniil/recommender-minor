@@ -8,18 +8,20 @@ class SongRecommender:
     def __init__(self):
         # load song data from csv into a dataframe
         self.song_data = pd.read_csv("data/spotify_cleaned.csv")
-        
+
         # Add unique ID column if it doesn't exist
-        if 'song_id' not in self.song_data.columns:
-            self.song_data['song_id'] = [f'song_{i}' for i in range(len(self.song_data))]
-        
+        if "song_id" not in self.song_data.columns:
+            self.song_data["song_id"] = [
+                f"song_{i}" for i in range(len(self.song_data))
+            ]
+
         # Prepare the data for similarity calculation
         self.prepare_data()
 
     def prepare_data(self):
         """Prepare the data for similarity calculations"""
         data = self.song_data.copy()
-        
+
         # One-hot encode categorical features
         genres = pd.get_dummies(data["genre"], prefix="genre")
         moods = pd.get_dummies(data["mood"], prefix="mood")
@@ -40,8 +42,8 @@ class SongRecommender:
         self, title, artist, genre, tempo, danceability, energy, mood, acousticness
     ):
         """Add a new song to the database"""
-        new_id = f'song_{len(self.song_data)}'
-        
+        new_id = f"song_{len(self.song_data)}"
+
         new_song = pd.DataFrame(
             [
                 {
@@ -67,7 +69,7 @@ class SongRecommender:
         # Find indices of input songs
         indices = []
         for song_id in song_ids:
-            match = self.song_data[self.song_data['song_id'] == song_id]
+            match = self.song_data[self.song_data["song_id"] == song_id]
             if not match.empty:
                 indices.append(match.index[0])
 
@@ -90,13 +92,13 @@ class SongRecommender:
 
     def get_song_by_id(self, song_id):
         """Get song details by ID"""
-        return self.song_data[self.song_data['song_id'] == song_id]
+        return self.song_data[self.song_data["song_id"] == song_id]
 
     def search_songs(self, query):
         """Search songs by title or artist"""
         return self.song_data[
-            self.song_data['title'].str.contains(query, case=False) |
-            self.song_data['artist'].str.contains(query, case=False)
+            self.song_data["title"].str.contains(query, case=False)
+            | self.song_data["artist"].str.contains(query, case=False)
         ]
 
 
@@ -106,7 +108,11 @@ if __name__ == "__main__":
 
     print("Welcome to the Song Recommender System!")
     print("Available songs in database:")
-    print(recommender.song_data[["song_id", "title", "artist", "genre"]].to_string(index=False))
+    print(
+        recommender.song_data[["song_id", "title", "artist", "genre"]].to_string(
+            index=False
+        )
+    )
 
     while True:
         print("\nEnter a song title or artist to search for:")
@@ -119,7 +125,7 @@ if __name__ == "__main__":
         print(matches[["song_id", "title", "artist", "genre"]].to_string(index=False))
         print("\nEnter the song ID of the song you want to select:")
         selected_id = input().strip()
-        if selected_id not in matches['song_id'].values:
+        if selected_id not in matches["song_id"].values:
             print("Invalid song ID.")
             continue
         print(f"Searching for recommendations...")
